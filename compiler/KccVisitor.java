@@ -13,7 +13,7 @@ public class KccVisitor extends KnightCodeBaseVisitor<Void> {
             String varName = variableCtx.identifier().getText();
             String varType = variableCtx.vartype().getText();
             symbolTable.register(varName, varType);
-            // Example: Assuming all variables are integers for simplicity
+            
             bytecodeGenerator.addIntegerVariable(varName, 0); // Initializing with 0
         }
         return null;
