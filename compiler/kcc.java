@@ -30,7 +30,7 @@ public class kcc {
             var parser = new KnightCodeParser(tokens);
 
             // Parse the input file to generate the parse tree
-            ParseTree tree = parser.file(); // Assuming 'file' is the root rule in your grammar
+            ParseTree tree = parser.file(); // file is root in grammar
 
             // Initialize your custom visitor here and visit the parse tree
             // KccVisitor visitor = new KccVisitor();
