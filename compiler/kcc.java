@@ -33,8 +33,8 @@ public class kcc {
             ParseTree tree = parser.file(); // file is root in grammar
 
             // Initialize your custom visitor here and visit the parse tree
-            // KccVisitor visitor = new KccVisitor();
-            // visitor.visit(tree);
+            KccVisitor visitor = new KccVisitor();
+            visitor.visit(tree);
 
             // Placeholder for bytecode generation logic
             System.out.println("Parsing and visitor traversal complete. Output file generation not yet implemented.");
