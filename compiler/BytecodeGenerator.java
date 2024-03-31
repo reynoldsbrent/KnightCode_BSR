@@ -37,6 +37,10 @@ public class BytecodeGenerator implements Opcodes {
         // Start the main method. 
         methodVisitor = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
         methodVisitor.visitCode();
+        methodVisitor.visitInsn(RETURN);
+        // Auto compute stack and local variables size. Adjust these based on your method's content
+        methodVisitor.visitMaxs(-1, -1); // ASM's COMPUTE_FRAMES flag requires maxs to be computed.
+        methodVisitor.visitEnd();
     }
 
     public void endMainMethod() {
