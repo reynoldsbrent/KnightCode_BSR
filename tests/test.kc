@@ -1,0 +1,5 @@
+PROGRAM test
+
+DECLARE INTEGER x
+SET x := 10
+PRINT x
