@@ -5,27 +5,45 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class BytecodeGenerator implements Opcodes {
-    private ClassWriter classWriter;
-    private MethodVisitor methodVisitor;
+    private ClassWriter classWriter = null; // Initialized later in startClass
+    private MethodVisitor methodVisitor = null;
+    private String className = null; // Will be set in startClass
 
     public BytecodeGenerator() {
-        classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        // Start a class definition
-        classWriter.visit(V1_8, ACC_PUBLIC, "KnightCodeProgram", null, "java/lang/Object", null);
-        // Initialize the default constructor
-        initConstructor();
+        // Constructor remains empty for now, as setup requiring class name is deferred to startClass
+    }
+    public void initConstructor() {
+        // Generates the default constructor
+        MethodVisitor mv = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+        mv.visitCode();
+        mv.visitVarInsn(ALOAD, 0); // Load "this"
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false); // Call the constructor of super class (Object)
+        mv.visitInsn(RETURN);
+        mv.visitMaxs(1, 1);
+        mv.visitEnd();
+        
+    }
+    public void startClass(String name) {
+        this.className = name.replace(".class", "").replace("/", ".");
+        this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        // Initiate class with ACC_PUBLIC and specify it extends java/lang/Object
+        classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, this.className, null, "java/lang/Object", null);
+        initConstructor(); // Initialize the default constructor
+        startMainMethod(); // Optionally start the main method here, if your class structure assumes it
     }
 
-    private void initConstructor() {
-        // Implement the constructor for the class
-    }
 
     public void startMainMethod() {
-        // Begin the main method
+        // Start the main method. 
+        methodVisitor = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+        methodVisitor.visitCode();
     }
 
     public void endMainMethod() {
-        // End the main method
+        // Ends the main method
+        methodVisitor.visitInsn(RETURN);
+        methodVisitor.visitMaxs(-1, -1); // Auto-compute stack and local variable size
+        methodVisitor.visitEnd();
     }
 
     public byte[] getBytecode() {
