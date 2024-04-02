@@ -1,5 +1,9 @@
 PROGRAM test
 
 DECLARE INTEGER x
-SET x := 10
-PRINT x
+BEGIN
+
+SET X := 10
+PRINT "Hello"
+
+END
