@@ -4,32 +4,51 @@ import lexparse.KnightCodeBaseVisitor;
 import lexparse.KnightCodeParser;
 
 public class KccVisitor extends KnightCodeBaseVisitor<Void> {
-    private SymbolTable symbolTable = new SymbolTable();
-    private BytecodeGenerator bytecodeGenerator = new BytecodeGenerator();
+    private final SymbolTable symbolTable;
+    private final BytecodeGenerator bytecodeGenerator;
+
+    // Constructor injection for dependencies
+    public KccVisitor(SymbolTable symbolTable, BytecodeGenerator bytecodeGenerator) {
+        this.symbolTable = symbolTable;
+        this.bytecodeGenerator = bytecodeGenerator;
+    }
 
     @Override
     public Void visitDeclare(KnightCodeParser.DeclareContext ctx) {
+        // Declaration logic, including variable registration and type handling
         for (KnightCodeParser.VariableContext variableCtx : ctx.variable()) {
             String varName = variableCtx.identifier().getText();
             String varType = variableCtx.vartype().getText();
-            symbolTable.register(varName, varType);
-            
-            bytecodeGenerator.addIntegerVariable(varName, 0); // Initializing with 0
+            symbolTable.register(varName, varType); // Assume register also assigns an index
         }
         return null;
     }
 
-
     @Override
     public Void visitPrint(KnightCodeParser.PrintContext ctx) {
-        // Handle print statements, including bytecode generation
+        if (ctx.ID() != null) {
+            String varName = ctx.ID().getText();
+            int index = symbolTable.getIndex(varName); // Retrieve variable index
+            bytecodeGenerator.loadVariable(index); // Load variable onto stack
+            bytecodeGenerator.printInteger(); // Assume the variable is an integer
+        } else if (ctx.STRING() != null) {
+            bytecodeGenerator.printString(ctx.STRING().getText()); // Directly print string literals
+        }
         return null;
     }
 
-    public BytecodeGenerator getBytecodeGenerator() {
-        return this.bytecodeGenerator;
+    @Override
+    public Void visitAddition(KnightCodeParser.AdditionContext ctx) {
+        // Visit children to push their results onto the stack
+        ctx.expr().forEach(this::visit);
+        bytecodeGenerator.addIntegers(); // Perform addition
+        return null;
     }
 
-    // Implement additional visit methods for arithmetic, control structures, etc.
+    // Implement additional visit methods as needed
+
+    public BytecodeGenerator getBytecodeGenerator() {
+        return bytecodeGenerator;
+    }
 }
 
