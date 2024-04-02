@@ -1,64 +1,104 @@
 package compiler;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 public class BytecodeGenerator implements Opcodes {
-    private ClassWriter classWriter = null; // Initialized later in startClass
-    private MethodVisitor methodVisitor = null;
-    private String className = null; // Will be set in startClass
+    private ClassWriter classWriter;
+    private MethodVisitor methodVisitor;
+    private String className;
 
     public BytecodeGenerator() {
-        // Constructor remains empty for now, as setup requiring class name is deferred to startClass
+        // Placeholder for potential future initialization
     }
-    public void initConstructor() {
-        // Generates the default constructor
+
+    public void startClass(String name) {
+        this.className = name.replace(".class", "").replaceAll("/", ".");
+        // COMPUTE_FRAMES flag to automatically compute stack map frames and local variable tables.
+        this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
+        classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, this.className, null, "java/lang/Object", null);
+        initConstructor();
+    }
+
+    private void initConstructor() {
         MethodVisitor mv = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
         mv.visitVarInsn(ALOAD, 0); // Load "this"
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false); // Call the constructor of super class (Object)
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         mv.visitInsn(RETURN);
-        mv.visitMaxs(1, 1);
+        mv.visitMaxs(-1, -1); // Auto-compute stack and locals
         mv.visitEnd();
-        
     }
-    public void startClass(String name) {
-        this.className = name.replace(".class", "").replace("/", ".");
-        this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        // Initiate class with ACC_PUBLIC and specify it extends java/lang/Object
-        classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, this.className, null, "java/lang/Object", null);
-        initConstructor(); // Initialize the default constructor
-        startMainMethod(); // Optionally start the main method here, if your class structure assumes it
-    }
-
 
     public void startMainMethod() {
-        // Start the main method. 
-        methodVisitor = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
+        this.methodVisitor = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
         methodVisitor.visitCode();
+        // Start of method bytecode generation goes here
+    }
+
+    public void finalizeMainMethod() {
         methodVisitor.visitInsn(RETURN);
-        // Auto compute stack and local variables size. Adjust these based on your method's content
-        methodVisitor.visitMaxs(-1, -1); // ASM's COMPUTE_FRAMES flag requires maxs to be computed.
+        methodVisitor.visitMaxs(-1, -1); // ASM computes the frame and stack sizes.
         methodVisitor.visitEnd();
     }
 
-    public void endMainMethod() {
-        // Ends the main method
-        methodVisitor.visitInsn(RETURN);
-        methodVisitor.visitMaxs(-1, -1); // Auto-compute stack and local variable size
-        methodVisitor.visitEnd();
+    public void loadVariable(int index) {
+        methodVisitor.visitVarInsn(ILOAD, index);
+    }
+
+    public void storeVariable(int index) {
+        methodVisitor.visitVarInsn(ISTORE, index);
+    }
+
+    public void printString(String text) {
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        methodVisitor.visitLdcInsn(text);
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+    }
+
+    public void printInteger() {
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        methodVisitor.visitInsn(SWAP); // Adjust stack order for printStream.println method call
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
+    }
+
+    public void addIntegers() {
+        methodVisitor.visitInsn(IADD);
+    }
+
+    public void subtractIntegers() {
+        methodVisitor.visitInsn(ISUB);
+    }
+
+    public void multiplyIntegers() {
+        methodVisitor.visitInsn(IMUL);
+    }
+
+    public void divideIntegers() {
+        methodVisitor.visitInsn(IDIV);
+    }
+
+    // Conditional jump based on integer comparison equal
+    public void ifIntegersEqual(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPEQ, label);
+    }
+
+    // Label definition and placement
+    public void label(Label label) {
+        methodVisitor.visitLabel(label);
+    }
+
+    // Unconditional jump to a label
+    public void goTo(Label label) {
+        methodVisitor.visitJumpInsn(GOTO, label);
     }
 
     public byte[] getBytecode() {
+        classWriter.visitEnd(); // Complete the class
         return classWriter.toByteArray();
     }
 
-    // Method for adding an integer variable
-    public void addIntegerVariable(String name, int value) {
-        // Use methodVisitor to visitVarInsn and visitIntInsn
-    }
-
-    // Additional methods for handling arithmetic, control structures, etc.
+    // Additional utility methods can be added as needed.
 }
-
