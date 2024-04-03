@@ -1,9 +1,11 @@
 PROGRAM test
 
-DECLARE INTEGER x
+DECLARE INTEGER X
 BEGIN
 
 SET X := 10
 PRINT "Hello"
+PRINT "My name is Brent"
+PRINT X
 
 END
