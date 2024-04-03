@@ -25,6 +25,18 @@ public class KccVisitor extends KnightCodeBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
+        String varName = ctx.ID().getText();
+        int value = Integer.parseInt(ctx.expr().getText()); // Assuming expr results in a directly usable integer
+        if (symbolTable.isDeclared(varName)) {
+            bytecodeGenerator.storeVariable(symbolTable.getIndex(varName), value);
+        } else {
+            System.err.println("Variable " + varName + " not declared.");
+        }
+        return null; // Continue tree traversal
+    }
+
+    @Override
     public Void visitPrint(KnightCodeParser.PrintContext ctx) {
         if (ctx.ID() != null) {
             String varName = ctx.ID().getText();
