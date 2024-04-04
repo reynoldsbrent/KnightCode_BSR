@@ -27,14 +27,46 @@ public class KccVisitor extends KnightCodeBaseVisitor<Void> {
     @Override
     public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
         String varName = ctx.ID().getText();
-        int value = Integer.parseInt(ctx.expr().getText()); // Assuming expr results in a directly usable integer
+        // This call now prepares bytecode for evaluating the expression and leaves the result on the stack.
+        evaluateExpression(ctx.expr());
+        
+        // Now, we expect the result of the expression to be on top of the stack.
+        // Next, we need to store this result in the variable `varName`.
         if (symbolTable.isDeclared(varName)) {
-            bytecodeGenerator.storeVariable(symbolTable.getIndex(varName), value);
+            int index = symbolTable.getIndex(varName);
+            bytecodeGenerator.storeVariable(index); // Adjusted to assume result is already on the stack.
         } else {
             System.err.println("Variable " + varName + " not declared.");
         }
-        return null; // Continue tree traversal
+        return null;
     }
+
+private void evaluateExpression(KnightCodeParser.ExprContext expr) {
+    if (expr instanceof KnightCodeParser.NumberContext) {
+        // Push number constant onto the stack.
+        int value = Integer.parseInt(expr.getText());
+        bytecodeGenerator.pushValue(value);
+    } else if (expr instanceof KnightCodeParser.AdditionContext) {
+        KnightCodeParser.AdditionContext additionCtx = (KnightCodeParser.AdditionContext) expr;
+        // Evaluate left and right expressions to push their results onto the stack
+        evaluateExpression(additionCtx.expr(0));
+        evaluateExpression(additionCtx.expr(1));
+        // Perform addition on the top two stack values
+        bytecodeGenerator.addIntegers();
+    } // Implement subtraction, multiplication, and division similarly.
+    else if (expr instanceof KnightCodeParser.IdContext) {
+        String varName = expr.getText();
+        if (symbolTable.isDeclared(varName)) {
+            // Load the variable's value onto the stack.
+            int index = symbolTable.getIndex(varName);
+            bytecodeGenerator.loadVariable(index);
+        } else {
+            throw new RuntimeException("Variable '" + varName + "' is not declared.");
+        }
+    }
+    // Extend with more else-if blocks for other expression types as necessary.
+}
+
 
     @Override
     public Void visitPrint(KnightCodeParser.PrintContext ctx) {

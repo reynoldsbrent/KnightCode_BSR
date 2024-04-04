@@ -48,11 +48,14 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitVarInsn(ILOAD, index);
     }
 
-    public void storeVariable(int index, int value) {
-        // Generate bytecode to load the value onto the stack
-        methodVisitor.visitLdcInsn(value);
-        // Store the value in the local variable at the specified index
+    public void storeVariable(int index) {
+        // Store the top of the stack in the local variable at `index`.
+        // This corresponds to the result of the expression left on the stack by `evaluateExpression`.
         methodVisitor.visitVarInsn(ISTORE, index);
+    }
+
+    public void pushValue(int value) {
+        methodVisitor.visitLdcInsn(value);
     }
 
     public void printString(String text) {
