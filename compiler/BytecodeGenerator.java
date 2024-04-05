@@ -11,12 +11,11 @@ public class BytecodeGenerator implements Opcodes {
     private String className;
 
     public BytecodeGenerator() {
-        // Placeholder for potential future initialization
+        
     }
 
     public void startClass(String name) {
         this.className = name.replace(".class", "").replaceAll("/", ".");
-        // COMPUTE_FRAMES flag to automatically compute stack map frames and local variable tables.
         this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
         classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, this.className, null, "java/lang/Object", null);
         initConstructor();
@@ -28,14 +27,13 @@ public class BytecodeGenerator implements Opcodes {
         mv.visitVarInsn(ALOAD, 0); // Load "this"
         mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         mv.visitInsn(RETURN);
-        mv.visitMaxs(-1, -1); // Auto-compute stack and locals
+        mv.visitMaxs(-1, -1); // ASM will calculate the stack size
         mv.visitEnd();
     }
 
     public void startMainMethod() {
         this.methodVisitor = classWriter.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, null);
         methodVisitor.visitCode();
-        // Start of method bytecode generation goes here
     }
 
     public void finalizeMainMethod() {
@@ -96,7 +94,6 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
         // Load the string from the local variable index onto the stack
         methodVisitor.visitVarInsn(ALOAD, index);
-        // Call the println method
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
     }
 
@@ -111,7 +108,6 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
         // Load the integer from the local variable index onto the stack
         methodVisitor.visitVarInsn(ILOAD, index);
-        // Call the println method for integers
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
     }
     
@@ -148,7 +144,7 @@ public class BytecodeGenerator implements Opcodes {
     }
 
     public byte[] getBytecode() {
-        classWriter.visitEnd(); // Complete the class
+        classWriter.visitEnd(); 
         return classWriter.toByteArray();
     }
 

@@ -35,7 +35,7 @@ public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
         value = value.substring(1, value.length() - 1); // Remove quotes
         if (symbolTable.isDeclared(varName)) {
             int index = symbolTable.getIndex(varName); // Convert varName to its index
-            bytecodeGenerator.storeString(index, value); // Corrected to pass index and value
+            bytecodeGenerator.storeString(index, value); 
         } else {
             System.err.println("Variable " + varName + " not declared.");
         }
@@ -46,13 +46,13 @@ public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
         if (symbolTable.isDeclared(varName)) {
             int index = symbolTable.getIndex(varName);
             String type = symbolTable.getType(varName);
-            bytecodeGenerator.storeVariable(index, type); // Assume this method exists for storing the result of expressions
+            bytecodeGenerator.storeVariable(index, type); 
         } else {
             System.err.println("Variable " + varName + " not declared.");
         }
     }
     
-    return null; // Continue tree traversal
+    return null; 
 }
 
 
@@ -69,8 +69,13 @@ private void evaluateExpression(KnightCodeParser.ExprContext expr) {
         evaluateExpression(additionCtx.expr(0));
         evaluateExpression(additionCtx.expr(1));
         bytecodeGenerator.addIntegers();
+    }
+      else if (expr instanceof KnightCodeParser.SubtractionContext) {
+        KnightCodeParser.SubtractionContext subtractionCtx = (KnightCodeParser.SubtractionContext) expr;
+        evaluateExpression(subtractionCtx.expr(0)); // Evaluate the left side
+        evaluateExpression(subtractionCtx.expr(1)); // Evaluate the right side
+        bytecodeGenerator.subtractIntegers(); // Perform the subtraction
     } else if (expr instanceof KnightCodeParser.IdContext) {
-        // Variable reference
         String varName = expr.getText();
         if (!symbolTable.isDeclared(varName)) {
             throw new RuntimeException("Variable '" + varName + "' is not declared.");
@@ -108,7 +113,7 @@ public Void visitPrint(KnightCodeParser.PrintContext ctx) {
             if ("STRING".equals(varType)) {
                 bytecodeGenerator.printStringVariable(index); // For string variables
             } else if ("INTEGER".equals(varType)) {
-                bytecodeGenerator.printIntegerVariable(index); // Assuming a method for integers
+                bytecodeGenerator.printIntegerVariable(index); // For integer variables
             }
         } else {
             System.err.println("Variable '" + varName + "' is not declared.");
@@ -125,7 +130,6 @@ public Void visitPrint(KnightCodeParser.PrintContext ctx) {
         return null;
     }
 
-    // Implement additional visit methods as needed
 
     public BytecodeGenerator getBytecodeGenerator() {
         return bytecodeGenerator;
