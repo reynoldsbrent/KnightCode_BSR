@@ -54,6 +54,13 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitVarInsn(ISTORE, index);
     }
 
+    public void storeString(int index, String value) {
+        // Push the string value onto the stack
+        methodVisitor.visitLdcInsn(value);
+        // Store the string at the local variable index
+        methodVisitor.visitVarInsn(ASTORE, index);
+    }
+
     public void pushValue(int value) {
         methodVisitor.visitLdcInsn(value);
     }
@@ -64,11 +71,30 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
     }
 
+    public void printStringVariable(int index) {
+        // Load the PrintStream object for System.out onto the stack
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        // Load the string from the local variable index onto the stack
+        methodVisitor.visitVarInsn(ALOAD, index);
+        // Call the println method
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+    }
+
     public void printInteger() {
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
         methodVisitor.visitInsn(SWAP); // Adjust stack order for printStream.println method call
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
     }
+
+    public void printIntegerVariable(int index) {
+        // Load the PrintStream object for System.out onto the stack
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+        // Load the integer from the local variable index onto the stack
+        methodVisitor.visitVarInsn(ILOAD, index);
+        // Call the println method for integers
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
+    }
+    
 
     public void addIntegers() {
         methodVisitor.visitInsn(IADD);

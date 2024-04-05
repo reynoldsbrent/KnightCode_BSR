@@ -25,21 +25,35 @@ public class KccVisitor extends KnightCodeBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
-        String varName = ctx.ID().getText();
-        // This call now prepares bytecode for evaluating the expression and leaves the result on the stack.
-        evaluateExpression(ctx.expr());
-        
-        // Now, we expect the result of the expression to be on top of the stack.
-        // Next, we need to store this result in the variable `varName`.
+public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
+    String varName = ctx.ID().getText();
+    
+    // Check if we're assigning a string directly
+    if (ctx.STRING() != null) {
+        String value = ctx.STRING().getText();
+        value = value.substring(1, value.length() - 1); // Remove quotes
         if (symbolTable.isDeclared(varName)) {
-            int index = symbolTable.getIndex(varName);
-            bytecodeGenerator.storeVariable(index); // Adjusted to assume result is already on the stack.
+            int index = symbolTable.getIndex(varName); // Convert varName to its index
+            bytecodeGenerator.storeString(index, value); // Corrected to pass index and value
         } else {
             System.err.println("Variable " + varName + " not declared.");
         }
-        return null;
     }
+    // Handle expressions
+    else if (ctx.expr() != null) {
+        evaluateExpression(ctx.expr());
+        if (symbolTable.isDeclared(varName)) {
+            int index = symbolTable.getIndex(varName);
+            bytecodeGenerator.storeVariable(index); // Assume this method exists for storing the result of expressions
+        } else {
+            System.err.println("Variable " + varName + " not declared.");
+        }
+    }
+    
+    return null; // Continue tree traversal
+}
+
+
 
 private void evaluateExpression(KnightCodeParser.ExprContext expr) {
     if (expr instanceof KnightCodeParser.NumberContext) {
@@ -68,18 +82,32 @@ private void evaluateExpression(KnightCodeParser.ExprContext expr) {
 }
 
 
-    @Override
-    public Void visitPrint(KnightCodeParser.PrintContext ctx) {
-        if (ctx.ID() != null) {
-            String varName = ctx.ID().getText();
-            int index = symbolTable.getIndex(varName); // Retrieve variable index
-            bytecodeGenerator.loadVariable(index); // Load variable onto stack
-            bytecodeGenerator.printInteger(); // Assume the variable is an integer
-        } else if (ctx.STRING() != null) {
-            bytecodeGenerator.printString(ctx.STRING().getText()); // Directly print string literals
+@Override
+public Void visitPrint(KnightCodeParser.PrintContext ctx) {
+    // Handle string literals directly
+    if (ctx.STRING() != null) {
+        String literal = ctx.STRING().getText();
+        // Remove the surrounding quotes from the literal
+        String text = literal.substring(1, literal.length() - 1);
+        bytecodeGenerator.printString(text);
+    } 
+    // Handle printing of variables
+    else if (ctx.ID() != null) {
+        String varName = ctx.ID().getText();
+        if (symbolTable.isDeclared(varName)) {
+            int index = symbolTable.getIndex(varName);
+            String varType = symbolTable.getType(varName);
+            if ("STRING".equals(varType)) {
+                bytecodeGenerator.printStringVariable(index); // For string variables
+            } else if ("INTEGER".equals(varType)) {
+                bytecodeGenerator.printIntegerVariable(index); // Assuming a method for integers
+            }
+        } else {
+            System.err.println("Variable '" + varName + "' is not declared.");
         }
-        return null;
     }
+    return null;
+}
 
     @Override
     public Void visitAddition(KnightCodeParser.AdditionContext ctx) {
