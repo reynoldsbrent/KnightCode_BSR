@@ -26,6 +26,7 @@ public class KccVisitor extends KnightCodeBaseVisitor<Void> {
 
     @Override
 public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
+    System.out.println("Setting a variable...");
     String varName = ctx.ID().getText();
     
     // Check if we're assigning a string directly
@@ -44,7 +45,8 @@ public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
         evaluateExpression(ctx.expr());
         if (symbolTable.isDeclared(varName)) {
             int index = symbolTable.getIndex(varName);
-            bytecodeGenerator.storeVariable(index); // Assume this method exists for storing the result of expressions
+            String type = symbolTable.getType(varName);
+            bytecodeGenerator.storeVariable(index, type); // Assume this method exists for storing the result of expressions
         } else {
             System.err.println("Variable " + varName + " not declared.");
         }
@@ -56,34 +58,40 @@ public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
 
 
 private void evaluateExpression(KnightCodeParser.ExprContext expr) {
+    System.out.println("Evaluating expression...");
     if (expr instanceof KnightCodeParser.NumberContext) {
-        // Push number constant onto the stack.
+        // Direct number constant
         int value = Integer.parseInt(expr.getText());
         bytecodeGenerator.pushValue(value);
     } else if (expr instanceof KnightCodeParser.AdditionContext) {
+        // Addition: Recursive evaluation for both sides of the addition
         KnightCodeParser.AdditionContext additionCtx = (KnightCodeParser.AdditionContext) expr;
-        // Evaluate left and right expressions to push their results onto the stack
         evaluateExpression(additionCtx.expr(0));
         evaluateExpression(additionCtx.expr(1));
-        // Perform addition on the top two stack values
         bytecodeGenerator.addIntegers();
-    } // Implement subtraction, multiplication, and division similarly.
-    else if (expr instanceof KnightCodeParser.IdContext) {
+    } else if (expr instanceof KnightCodeParser.IdContext) {
+        // Variable reference
         String varName = expr.getText();
-        if (symbolTable.isDeclared(varName)) {
-            // Load the variable's value onto the stack.
-            int index = symbolTable.getIndex(varName);
-            bytecodeGenerator.loadVariable(index);
-        } else {
+        if (!symbolTable.isDeclared(varName)) {
             throw new RuntimeException("Variable '" + varName + "' is not declared.");
         }
+        int index = symbolTable.getIndex(varName);
+        String varType = symbolTable.getType(varName);
+        // Depending on the variable type, load it appropriately
+        if ("INTEGER".equals(varType)) {
+            bytecodeGenerator.loadVariable(index, varType);
+        } else if ("STRING".equals(varType)) {
+            bytecodeGenerator.loadVariable(index, varType);
+        }
     }
-    // Extend with more else-if blocks for other expression types as necessary.
+    // Handle other expression types (e.g., Subtraction, Multiplication, Division) similarly
 }
+
 
 
 @Override
 public Void visitPrint(KnightCodeParser.PrintContext ctx) {
+    System.out.println("I am printing something");
     // Handle string literals directly
     if (ctx.STRING() != null) {
         String literal = ctx.STRING().getText();

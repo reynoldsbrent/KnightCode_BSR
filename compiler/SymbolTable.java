@@ -41,4 +41,19 @@ public class SymbolTable {
     public boolean isDeclared(String name) {
         return variables.containsKey(name);
     }
+
+    @Override
+public String toString() {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Symbol Table Contents:\n");
+    for (Map.Entry<String, VariableInfo> entry : variables.entrySet()) {
+        String name = entry.getKey();
+        VariableInfo info = entry.getValue();
+        sb.append("Name: ").append(name)
+          .append(", Type: ").append(info.type)
+          .append(", Index: ").append(info.index)
+          .append("\n");
+    }
+    return sb.toString();
+}
 }

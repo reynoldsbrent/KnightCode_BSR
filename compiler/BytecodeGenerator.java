@@ -44,21 +44,40 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitEnd();
     }
 
-    public void loadVariable(int index) {
-        methodVisitor.visitVarInsn(ILOAD, index);
+    public void loadVariable(int index, String type) {
+        if ("INTEGER".equals(type)) {
+            // Load an integer from the local variable table onto the stack.
+            methodVisitor.visitVarInsn(ILOAD, index);
+            System.out.println("Loading integer from local variable table onto the stack");
+        } else if ("STRING".equals(type)) {
+            // Load a reference (e.g., a string) from the local variable table onto the stack.
+            methodVisitor.visitVarInsn(ALOAD, index);
+            System.out.println("Loading string from local variable table onto the stack");
+        } else {
+            throw new IllegalArgumentException("Unsupported variable type: " + type);
+        }
     }
 
-    public void storeVariable(int index) {
-        // Store the top of the stack in the local variable at `index`.
-        // This corresponds to the result of the expression left on the stack by `evaluateExpression`.
-        methodVisitor.visitVarInsn(ISTORE, index);
+    public void storeVariable(int index, String type) {
+        if ("INTEGER".equals(type)) {
+            // For integers, use ISTORE to store an int from the stack into the local variable table.
+            methodVisitor.visitVarInsn(ISTORE, index);
+        } else if ("STRING".equals(type)) {
+            // For strings or other objects, use ASTORE to store a reference from the stack into the local variable table.
+            methodVisitor.visitVarInsn(ASTORE, index);
+        } else {
+            throw new IllegalArgumentException("Unsupported type: " + type);
+        }
+        System.out.println("Storing result of expression in local variable table as " + type);
     }
+    
 
     public void storeString(int index, String value) {
         // Push the string value onto the stack
         methodVisitor.visitLdcInsn(value);
         // Store the string at the local variable index
         methodVisitor.visitVarInsn(ASTORE, index);
+        System.out.println("Storing string in local variable table");
     }
 
     public void pushValue(int value) {
@@ -69,6 +88,7 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
         methodVisitor.visitLdcInsn(text);
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
+        System.out.println("Printing string: " + text);
     }
 
     public void printStringVariable(int index) {
