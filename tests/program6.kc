@@ -1,0 +1,15 @@
+PROGRAM Program6
+
+DECLARE
+	STRING first
+	STRING last
+
+BEGIN
+
+SET first := "Brent"
+SET last := first
+
+PRINT last
+
+END
+

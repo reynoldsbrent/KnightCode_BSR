@@ -5,6 +5,8 @@ DECLARE
 	INTEGER y
 	INTEGER z
 	INTEGER a
+	STRING first
+	STRING last
 
 BEGIN
 
