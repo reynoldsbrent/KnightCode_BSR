@@ -4,12 +4,14 @@ DECLARE
 	INTEGER x
 	INTEGER y
 	INTEGER z
+	INTEGER a
 
 BEGIN
 
 SET x := 10
 SET y := 12
-SET z := x + y
+SET a := 10
+SET z := x + y + a
 
 PRINT z
 

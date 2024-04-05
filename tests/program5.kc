@@ -1,0 +1,11 @@
+PROGRAM Program1
+
+DECLARE
+    STRING last
+
+BEGIN
+
+SET last := "Reynolds"
+PRINT last
+
+END
