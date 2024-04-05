@@ -1,10 +1,11 @@
-PROGRAM Program1
+PROGRAM Program7
 
 DECLARE
 	INTEGER x
 	INTEGER y
 	INTEGER z
 	INTEGER a
+    INTEGER b
 	STRING first
 	STRING last
 
@@ -14,9 +15,10 @@ SET x := 10
 SET y := 12
 SET a := 10
 SET z := x + y + a
+SET b := x - x - y
 
 
 PRINT z
+PRINT b
 
 END
-
