@@ -114,18 +114,22 @@ public class BytecodeGenerator implements Opcodes {
 
     public void addIntegers() {
         methodVisitor.visitInsn(IADD);
+        System.out.println("Call to addIntegers");
     }
 
     public void subtractIntegers() {
         methodVisitor.visitInsn(ISUB);
+        System.out.println("Call to subtractIntegers");
     }
 
     public void multiplyIntegers() {
         methodVisitor.visitInsn(IMUL);
+        System.out.println("Call to multiplyIntegers");
     }
 
     public void divideIntegers() {
         methodVisitor.visitInsn(IDIV);
+        System.out.println("Call to divideIntegers");
     }
 
     // Conditional jump based on integer comparison equal

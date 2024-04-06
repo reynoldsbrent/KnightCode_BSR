@@ -60,21 +60,28 @@ public Void visitSetvar(KnightCodeParser.SetvarContext ctx) {
 private void evaluateExpression(KnightCodeParser.ExprContext expr) {
     System.out.println("Evaluating expression...");
     if (expr instanceof KnightCodeParser.NumberContext) {
-        // Direct number constant
         int value = Integer.parseInt(expr.getText());
         bytecodeGenerator.pushValue(value);
+    } else if (expr instanceof KnightCodeParser.MultiplicationContext) {
+        KnightCodeParser.MultiplicationContext multCtx = (KnightCodeParser.MultiplicationContext) expr;
+        evaluateExpression(multCtx.expr(0)); // Evaluate left operand
+        evaluateExpression(multCtx.expr(1)); // Evaluate right operand
+        bytecodeGenerator.multiplyIntegers(); // Perform multiplication
+    } else if (expr instanceof KnightCodeParser.DivisionContext) {
+        KnightCodeParser.DivisionContext divCtx = (KnightCodeParser.DivisionContext) expr;
+        evaluateExpression(divCtx.expr(0)); // Evaluate left operand
+        evaluateExpression(divCtx.expr(1)); // Evaluate right operand
+        bytecodeGenerator.divideIntegers(); // Perform division
     } else if (expr instanceof KnightCodeParser.AdditionContext) {
-        // Addition: Recursive evaluation for both sides of the addition
-        KnightCodeParser.AdditionContext additionCtx = (KnightCodeParser.AdditionContext) expr;
-        evaluateExpression(additionCtx.expr(0));
-        evaluateExpression(additionCtx.expr(1));
+        KnightCodeParser.AdditionContext addCtx = (KnightCodeParser.AdditionContext) expr;
+        evaluateExpression(addCtx.expr(0));
+        evaluateExpression(addCtx.expr(1));
         bytecodeGenerator.addIntegers();
-    }
-      else if (expr instanceof KnightCodeParser.SubtractionContext) {
-        KnightCodeParser.SubtractionContext subtractionCtx = (KnightCodeParser.SubtractionContext) expr;
-        evaluateExpression(subtractionCtx.expr(0)); // Evaluate the left side
-        evaluateExpression(subtractionCtx.expr(1)); // Evaluate the right side
-        bytecodeGenerator.subtractIntegers(); // Perform the subtraction
+    } else if (expr instanceof KnightCodeParser.SubtractionContext) {
+        KnightCodeParser.SubtractionContext subCtx = (KnightCodeParser.SubtractionContext) expr;
+        evaluateExpression(subCtx.expr(0));
+        evaluateExpression(subCtx.expr(1));
+        bytecodeGenerator.subtractIntegers();
     } else if (expr instanceof KnightCodeParser.IdContext) {
         String varName = expr.getText();
         if (!symbolTable.isDeclared(varName)) {
@@ -82,15 +89,11 @@ private void evaluateExpression(KnightCodeParser.ExprContext expr) {
         }
         int index = symbolTable.getIndex(varName);
         String varType = symbolTable.getType(varName);
-        // Depending on the variable type, load it appropriately
-        if ("INTEGER".equals(varType)) {
-            bytecodeGenerator.loadVariable(index, varType);
-        } else if ("STRING".equals(varType)) {
-            bytecodeGenerator.loadVariable(index, varType);
-        }
+        bytecodeGenerator.loadVariable(index, varType);
     }
-    // Handle other expression types (e.g., Subtraction, Multiplication, Division) similarly
+    // Extend this method to include other expression types as needed
 }
+
 
 
 
@@ -127,6 +130,7 @@ public Void visitPrint(KnightCodeParser.PrintContext ctx) {
         // Visit children to push their results onto the stack
         ctx.expr().forEach(this::visit);
         bytecodeGenerator.addIntegers(); // Perform addition
+        System.out.println("Adding two integers");
         return null;
     }
 
