@@ -1,0 +1,17 @@
+PROGRAM Program10
+
+DECLARE
+	INTEGER x
+    INTEGER b
+    INTEGER c
+
+BEGIN
+
+SET x := 10
+SET b := 10 
+SET c := x / b
+
+
+PRINT c
+
+END

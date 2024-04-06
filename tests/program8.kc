@@ -1,20 +1,13 @@
-PROGRAM Program7
+PROGRAM Program8
 
 DECLARE
 	INTEGER x
-	INTEGER y
-	INTEGER z
-	INTEGER a
     INTEGER b
     INTEGER c
-	STRING first
-	STRING last
 
 BEGIN
 
 SET x := 10
-SET y := 12
-SET a := 10
 SET b := 10 - 10 + 10
 SET c := x + x - 10 + 10
 
