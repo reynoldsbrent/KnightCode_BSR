@@ -137,6 +137,35 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitJumpInsn(IF_ICMPEQ, label);
     }
 
+    public void readInteger(int index) {
+        // Instantiate Scanner System.in
+        methodVisitor.visitTypeInsn(NEW, "java/util/Scanner");
+        methodVisitor.visitInsn(DUP);
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "in", "Ljava/io/InputStream;");
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/util/Scanner", "<init>", "(Ljava/io/InputStream;)V", false);
+        
+        // Call Scanner.nextInt()
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextInt", "()I", false);
+        
+        // Store the result in the local variable table
+        methodVisitor.visitVarInsn(ISTORE, index);
+    }
+    
+    public void readString(int index) {
+        // Instantiate Scanner System.in
+        methodVisitor.visitTypeInsn(NEW, "java/util/Scanner");
+        methodVisitor.visitInsn(DUP);
+        methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "in", "Ljava/io/InputStream;");
+        methodVisitor.visitMethodInsn(INVOKESPECIAL, "java/util/Scanner", "<init>", "(Ljava/io/InputStream;)V", false);
+        
+        // Call Scanner.nextLine()
+        methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/util/Scanner", "nextLine", "()Ljava/lang/String;", false);
+        
+        // Store the result in the local variable table
+        methodVisitor.visitVarInsn(ASTORE, index);
+    }
+    
+
     // Label definition and placement
     public void label(Label label) {
         methodVisitor.visitLabel(label);

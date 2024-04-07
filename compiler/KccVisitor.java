@@ -134,6 +134,27 @@ public Void visitPrint(KnightCodeParser.PrintContext ctx) {
         return null;
     }
 
+    @Override
+public Void visitRead(KnightCodeParser.ReadContext ctx) {
+    String varName = ctx.ID().getText();
+    if (!symbolTable.isDeclared(varName)) {
+        throw new RuntimeException("Variable '" + varName + "' is not declared.");
+    }
+    String varType = symbolTable.getType(varName);
+    int index = symbolTable.getIndex(varName);
+    
+    // Call the appropriate method to read an integer or string
+    if ("INTEGER".equals(varType)) {
+        bytecodeGenerator.readInteger(index);
+    } else if ("STRING".equals(varType)) {
+        bytecodeGenerator.readString(index);
+    } else {
+        throw new RuntimeException("Unsupported type for read operation: " + varType);
+    }
+    return null;
+}
+
+
 
     public BytecodeGenerator getBytecodeGenerator() {
         return bytecodeGenerator;
