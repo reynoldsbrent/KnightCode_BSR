@@ -1,0 +1,14 @@
+PROGRAM Program11
+
+DECLARE
+	INTEGER x
+    STRING y
+
+BEGIN
+	PRINT "Enter a number: "
+	READ x
+	PRINT x
+    PRINT "Enter a string: "
+    READ y
+    PRINT y
+END

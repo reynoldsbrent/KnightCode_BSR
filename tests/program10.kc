@@ -7,9 +7,9 @@ DECLARE
 
 BEGIN
 
-SET x := 10
+SET x := 20
 SET b := 10 
-SET c := x / b
+SET c := x / b * 5
 
 
 PRINT c
