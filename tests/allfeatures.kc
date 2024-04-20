@@ -1,0 +1,62 @@
+PROGRAM Program4
+
+DECLARE
+	STRING name
+	INTEGER reps
+    INTEGER x
+	INTEGER y
+	INTEGER z
+    INTEGER a
+    INTEGER b 
+    INTEGER c 
+    INTEGER d
+    INTEGER e 
+    INTEGER f
+
+
+BEGIN
+
+    SET a := 10
+    SET b := 20
+    SET c := a + b
+    SET d := b - a
+    SET e := a * b
+    SET f := b / a
+
+    PRINT a
+    PRINT b 
+    PRINT c
+    PRINT d 
+    PRINT e 
+    PRINT f 
+
+    PRINT "---------------------------------"
+
+
+	PRINT "Enter your name: "
+	READ name
+	PRINT "Enter repetitions: "
+	READ reps
+    PRINT "----------------------------------"
+	WHILE reps> 0 DO
+		PRINT name
+		SET reps := reps - 1
+	ENDWHILE
+
+    PRINT "----------------------------------"
+    PRINT "Enter a number: "
+	READ x
+	PRINT "Enter another number: "
+	READ y
+    PRINT "-----------------------------------"
+	IF x > y THEN SET z:=10 * x
+	ELSE SET z:=12 * y
+	ENDIF
+    PRINT z
+    PRINT "-----------------------------------" #This is a comment
+	WHILE x > 0 DO
+		PRINT x
+		SET x := x - 1
+	ENDWHILE
+#This is a comment
+END
