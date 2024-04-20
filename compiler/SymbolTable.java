@@ -7,7 +7,6 @@ public class SymbolTable {
     private final Map<String, VariableInfo> variables = new HashMap<>();
     private int nextIndex = 1; // Tracks the next available index for local variables
 
-    // Inner class to hold variable information (type and index)
     private static class VariableInfo {
         String type;
         int index;

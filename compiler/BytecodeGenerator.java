@@ -24,10 +24,10 @@ public class BytecodeGenerator implements Opcodes {
     private void initConstructor() {
         MethodVisitor mv = classWriter.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
         mv.visitCode();
-        mv.visitVarInsn(ALOAD, 0); // Load "this"
+        mv.visitVarInsn(ALOAD, 0); 
         mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
         mv.visitInsn(RETURN);
-        mv.visitMaxs(-1, -1); // ASM will calculate the stack size
+        mv.visitMaxs(-1, -1); 
         mv.visitEnd();
     }
 
@@ -38,19 +38,15 @@ public class BytecodeGenerator implements Opcodes {
 
     public void finalizeMainMethod() {
         methodVisitor.visitInsn(RETURN);
-        methodVisitor.visitMaxs(-1, -1); // ASM computes the frame and stack sizes.
+        methodVisitor.visitMaxs(-1, -1); 
         methodVisitor.visitEnd();
     }
 
     public void loadVariable(int index, String type) {
         if ("INTEGER".equals(type)) {
-            // Load an integer from the local variable table onto the stack.
             methodVisitor.visitVarInsn(ILOAD, index);
-            System.out.println("Loading integer from local variable table onto the stack");
         } else if ("STRING".equals(type)) {
-            // Load a reference (e.g., a string) from the local variable table onto the stack.
             methodVisitor.visitVarInsn(ALOAD, index);
-            System.out.println("Loading string from local variable table onto the stack");
         } else {
             throw new IllegalArgumentException("Unsupported variable type: " + type);
         }
@@ -58,15 +54,13 @@ public class BytecodeGenerator implements Opcodes {
 
     public void storeVariable(int index, String type) {
         if ("INTEGER".equals(type)) {
-            // For integers, use ISTORE to store an int from the stack into the local variable table.
             methodVisitor.visitVarInsn(ISTORE, index);
         } else if ("STRING".equals(type)) {
-            // For strings or other objects, use ASTORE to store a reference from the stack into the local variable table.
             methodVisitor.visitVarInsn(ASTORE, index);
         } else {
             throw new IllegalArgumentException("Unsupported type: " + type);
         }
-        System.out.println("Storing result of expression in local variable table as " + type);
+        //System.out.println("Storing result of expression in local variable table as " + type);
     }
     
 
@@ -75,7 +69,6 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitLdcInsn(value);
         // Store the string at the local variable index
         methodVisitor.visitVarInsn(ASTORE, index);
-        System.out.println("Storing string in local variable table");
     }
 
     public void pushValue(int value) {
@@ -86,7 +79,6 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
         methodVisitor.visitLdcInsn(text);
         methodVisitor.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false);
-        System.out.println("Printing string: " + text);
     }
 
     public void printStringVariable(int index) {
@@ -114,28 +106,68 @@ public class BytecodeGenerator implements Opcodes {
 
     public void addIntegers() {
         methodVisitor.visitInsn(IADD);
-        System.out.println("Call to addIntegers");
     }
 
     public void subtractIntegers() {
         methodVisitor.visitInsn(ISUB);
-        System.out.println("Call to subtractIntegers");
     }
 
     public void multiplyIntegers() {
         methodVisitor.visitInsn(IMUL);
-        System.out.println("Call to multiplyIntegers");
     }
 
     public void divideIntegers() {
         methodVisitor.visitInsn(IDIV);
-        System.out.println("Call to divideIntegers");
     }
 
-    // Conditional jump based on integer comparison equal
-    public void ifIntegersEqual(Label label) {
-        methodVisitor.visitJumpInsn(IF_ICMPEQ, label);
+    public void compareGreaterThan() {
+        Label trueLabel = new Label();
+        Label endLabel = new Label();
+    
+        methodVisitor.visitJumpInsn(IF_ICMPGT, trueLabel);
+        methodVisitor.visitInsn(ICONST_0); // false
+        methodVisitor.visitJumpInsn(GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        methodVisitor.visitInsn(ICONST_1); // true
+        methodVisitor.visitLabel(endLabel);
     }
+    
+    public void compareLessThan() {
+        Label trueLabel = new Label();
+        Label endLabel = new Label();
+    
+        methodVisitor.visitJumpInsn(IF_ICMPLT, trueLabel);
+        methodVisitor.visitInsn(ICONST_0); // false
+        methodVisitor.visitJumpInsn(GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        methodVisitor.visitInsn(ICONST_1); // true
+        methodVisitor.visitLabel(endLabel);
+    }
+    
+    public void compareEquals() {
+        Label trueLabel = new Label();
+        Label endLabel = new Label();
+    
+        methodVisitor.visitJumpInsn(IF_ICMPEQ, trueLabel);
+        methodVisitor.visitInsn(ICONST_0); // false
+        methodVisitor.visitJumpInsn(GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        methodVisitor.visitInsn(ICONST_1); // true
+        methodVisitor.visitLabel(endLabel);
+    }
+    
+    public void compareNotEquals() {
+        Label trueLabel = new Label();
+        Label endLabel = new Label();
+    
+        methodVisitor.visitJumpInsn(IF_ICMPNE, trueLabel);
+        methodVisitor.visitInsn(ICONST_0); // false
+        methodVisitor.visitJumpInsn(GOTO, endLabel);
+        methodVisitor.visitLabel(trueLabel);
+        methodVisitor.visitInsn(ICONST_1); // true
+        methodVisitor.visitLabel(endLabel);
+    }
+    
 
     public void readInteger(int index) {
         // Instantiate Scanner System.in
@@ -165,21 +197,45 @@ public class BytecodeGenerator implements Opcodes {
         methodVisitor.visitVarInsn(ASTORE, index);
     }
     
-
-    // Label definition and placement
     public void label(Label label) {
         methodVisitor.visitLabel(label);
     }
 
-    // Unconditional jump to a label
     public void goTo(Label label) {
         methodVisitor.visitJumpInsn(GOTO, label);
     }
+
+    public void ifFalseJump(Label falseLabel) {
+        methodVisitor.visitJumpInsn(IFEQ, falseLabel);
+    }
+
+    public void compareGreaterThan(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPGT, label);
+    }
+
+    public void compareGreaterThanOrEqual(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPGE, label);
+    }
+    
+    public void compareLessThan(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPLT, label);
+    }
+    
+    public void compareLessThanOrEqual(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPLE, label);
+    }
+
+    public void compareEquals(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPEQ, label);
+    }
+    
+    public void compareNotEquals(Label label) {
+        methodVisitor.visitJumpInsn(IF_ICMPNE, label);
+    }
+    
 
     public byte[] getBytecode() {
         classWriter.visitEnd(); 
         return classWriter.toByteArray();
     }
-
-    // Additional utility methods can be added as needed.
 }
