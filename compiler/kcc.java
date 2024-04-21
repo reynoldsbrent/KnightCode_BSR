@@ -1,3 +1,13 @@
+/**
+ * Main class for the KnightCode compiler. This class handles the command-line interface, parses input files,
+ * and generates Java bytecode that can be run on the Java Virtual Machine.
+ *
+ * @author Brent Reynolds
+ * @version 1.0
+ * @assignment Assignment 5
+ * @course CS322 - Compiler Construction
+ * @term Spring 2024
+ */
 package compiler;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -9,14 +19,22 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class kcc {
+
+    /**
+     * Entry point for the compiler. It processes command line arguments to get input and output file paths,
+     * sets up the parsing and compiling environment, and initiates the compilation process.
+     *
+     * @param args command line arguments expecting two entries: the path to the input .kc file and the path for the output .class file.
+     */
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: java compiler.kcc <path to inputFile.kc> <path to outputFile>");
+            System.out.println("Usage: java compiler/kcc <path to inputFile.kc> <path to outputFile>");
             return;
         }
         String inputFile = args[0];
         String outputFile = args[1];
         
+        // Ensure the output file has a .class extension
         if (!outputFile.endsWith(".class")) {
             outputFile += ".class";
         }
@@ -65,6 +83,12 @@ public class kcc {
         
     }
 
+     /**
+     * Extracts the class name from the output file path.
+     *
+     * @param outputFile the output file path from which to extract the class name
+     * @return the extracted class name
+     */
     private static String extractClassName(String outputFile) {
         String fileName = new java.io.File(outputFile).getName();
         int dotIndex = fileName.lastIndexOf('.');
