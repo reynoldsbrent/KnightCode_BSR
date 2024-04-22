@@ -12,7 +12,7 @@ The KnightCode Compiler compiles programs written in KnightCode into Java byteco
 ## Using the Compiler
 
 ### Prerequisites
-- Java Development Kit (JDK) 8 or higher must be installed.
+- Java Development Kit (JDK) must be installed.
 - Clone the repository to you local machine.
 - ANTLR and ASM libraries need to be included in your project or build path.
 - Run the build-grammar and compile-grammar ANT commands to generate and compile the Java files produced by ANTLR. These commands can be found in the build.xml file.
