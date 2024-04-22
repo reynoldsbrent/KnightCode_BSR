@@ -35,7 +35,7 @@ public class BytecodeGenerator implements Opcodes {
     public void startClass(String name) {
         this.className = name.replace(".class", "").replaceAll("/", ".");
         this.classWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
-        classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, this.className, null, "java/lang/Object", null);
+        classWriter.visit(V1_8, ACC_PUBLIC + ACC_SUPER, "output/" + this.className, null, "java/lang/Object", null);
         initConstructor();
     }
 
