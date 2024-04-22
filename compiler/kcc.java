@@ -73,7 +73,7 @@ public class kcc {
             System.out.println("Bytecode successfully written to " + outputFile);
             //System.out.println(symbolTable);
             System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
-            System.out.println("To run the file, cd into the directory with the class file and use this command: java filename");
+            System.out.println("To run the file, use this command: java output/filename");
             System.out.println("----------------------------------------------------------------------------------------------------------------------------------");
 
         } catch (Exception e) {
