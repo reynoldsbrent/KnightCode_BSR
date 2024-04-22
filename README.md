@@ -26,7 +26,7 @@ The KnightCode Compiler compiles programs written in KnightCode into Java byteco
     java compiler/kcc tests/yourKnightCodeFile.kc output/yourKnightCodeFile
     ```
     - Replace `"yourKnightCodeFile"` with the name of the KnightCode file that you wrote.
-    - Run your Knight Code class file using this command:
+    - Run your KnightCode class file using this command:
     ```bash
     java output/yourKnightCodeFile
     ```
